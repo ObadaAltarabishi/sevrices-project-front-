@@ -22,6 +22,7 @@ import AdminLayout from './admin/AdminLayout';
 import ManageUser from './admin/ManageUser';
 import ManageServices from './admin/ManageServices';
 import ManageCategories from './admin/ManageCategories';
+import EditServicePage from './pages/EditServicePage';
 function App() {
   
  
@@ -64,6 +65,7 @@ function App() {
         <Route path="/admin/users" element={<ManageUser />}/>
         <Route path="/admin/services" element ={<ManageServices/>}/>
         <Route path="/admin/categories" element={<ManageCategories/>} />
+        <Route path="/edit-service/:id" element={<EditServicePage/>}/>
         
       </Routes>
       <ToastContainer position="top-center" autoClose={2000}/>
