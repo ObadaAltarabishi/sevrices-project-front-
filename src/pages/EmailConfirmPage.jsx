@@ -1,14 +1,43 @@
+import axios from 'axios';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function EmailConfirmationPage() {
   const navigate = useNavigate();
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const inputRefs = useRef([]);
   const expectedCode = '123456'; // Temporary hardcoded code
 
+  const handleSignIn = (e) => {
+    e.preventDefault();
+
+    try {
+      const userData = localStorage.getItem('user');
+      console.log(JSON.parse(userData).access_token)
+      console.log(code)
+      axios.post('http://127.0.0.1:8000/api/verify-code', { 'code': code }, {
+        headers: {
+          'Content-Type': 'application/json',
+
+          // 'Authorization': 'Bearer 8|80YhWDNDThQhNPcQDZOm6iHttqIzpRqINfLxPt5z2f74e924',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        }
+      },).then((res) => {
+        console.log(res.data)
+        navigate('/home');
+
+      }).catch((err) => {
+        console.log(err.response.data.message)
+        setError(err.response.data.message)
+      })
+    }
+    catch (err) {
+      setError(err.response)
+    }
+    // navigate('/home'); // Navigate to home page
+  };
   const handleChange = (index, value) => {
     if (/^\d?$/.test(value)) {
       const newCode = [...code];
@@ -46,9 +75,9 @@ function EmailConfirmationPage() {
     navigate('/register');
   };
 
-  useEffect(() => {
-    inputRefs.current[0].focus();
-  }, []);
+  // useEffect(() => {
+  //   inputRefs.current[0].focus();
+  // }, []);
 
   return (
     <div
@@ -73,7 +102,7 @@ function EmailConfirmationPage() {
         </p>
 
         {/* Verification code inputs */}
-        <div className="flex justify-center gap-3 mb-4">
+        {/* <div className="flex justify-center gap-3 mb-4">
           {code.map((digit, index) => (
             <input
               key={index}
@@ -92,7 +121,7 @@ function EmailConfirmationPage() {
               }}
             />
           ))}
-        </div>
+        </div> */}
 
         {/* Messages */}
         {error && (
@@ -107,9 +136,21 @@ function EmailConfirmationPage() {
         )}
 
         {/* Buttons */}
+
+        <div className="relative">
+
+          <input
+            type="text"
+            placeholder="Code"
+            className="w-full pl-10 pr-4 py-3 my-3 border border-[#FD7924] bg-[#ffffff] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+          />
+        </div>
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleConfirm}
+            onClick={handleSignIn}
             className="px-6 py-2 rounded-lg transition-all duration-200"
             style={{
               backgroundColor: '#FD7924',

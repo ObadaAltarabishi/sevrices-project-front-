@@ -1,63 +1,106 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import {
   FaTag, FaDollarSign, FaClock, FaUser, FaList, FaImage, FaAlignLeft
 } from 'react-icons/fa';
 
 export default function AddServicePage() {
   const [formData, setFormData] = useState({
-    title: '',
+    name: '',
     price: '',
-    duration: '',
+    exchange_time: new Date().toISOString().split('T')[0],
     provider: '',
-    category: '',
-    imageFile: null,
+    category_id: 0,
+    path: null,
     imagePreview: '',
     description: '',
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [categories, setCategories] = useState([false]);
 
-  const categories = [
-    'Graphic Design',
-    'Writing & Translation',
-    'Digital Marketing',
-    'Programming',
-    'Video & Animation',
-    'Music & Audio',
-    'Business',
-    'Lifestyle',
-  ];
-
+  // const categories = [
+  //   'Graphic Design',
+  //   'Writing & Translation',
+  //   'Digital Marketing',
+  //   'Programming',
+  //   'Video & Animation',
+  //   'Music & Audio',
+  //   'Business',
+  //   'Lifestyle',
+  // ];
+  const [selectedImage, setSelectedImage] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  useEffect(() => {
+    try {
+      axios.get('http://127.0.0.1:8000/api/categories').then((res) => {
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        imageFile: file,
-        imagePreview: URL.createObjectURL(file),
-      }));
+        setCategories(res.data.data);
+      }).catch((err) => {
+      })
+    } catch (err) {
     }
+  }, [])
+  const handleImageChange = (e) => {
+    // const file = e.target.files[0];
+    // if (file) {
+    //   setFormData((prev) => ({
+    //     ...prev,
+    //     path: file,
+    //     imagePreview: URL.createObjectURL(file),
+    //   }));
+    // }
+    const file = e.target.files[0];
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(formData)
     setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-    setFormData({
-      title: '',
-      price: '',
-      duration: '',
-      provider: '',
-      category: '',
-      imageFile: null,
-      imagePreview: '',
-      description: '',
-    });
+    try {
+      const userData = localStorage.getItem('user');
+
+
+      const form = new FormData();
+      form.append('path', selectedImage);
+      form.append('name', formData.name);
+      form.append('price', formData.price);
+      form.append('exchange_time', formData.exchange_time);
+      form.append('category_id', formData.category_id);
+      form.append('description', formData.description);
+      // formData.append('image', formData.);
+      axios.post('http://127.0.0.1:8000/api/services', form, {
+        headers: {
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        // setTimeout(() =>
+        setShowSuccess(false)
+        // , 3000);
+        setFormData({
+          name: '',
+          price: '',
+          exchange_time: new Date().toISOString().split('T')[0],
+          provider: '',
+          category_id: 0,
+          path: null,
+          imagePreview: '',
+          description: '',
+        });
+      }).catch((err) => {
+        setError(err.response.data.message)
+      })
+    }
+    catch (err) {
+      setError(err.response.data.message)
+    }
+
   };
 
   return (
@@ -74,14 +117,14 @@ export default function AddServicePage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
+          {/* name */}
           <div className="relative">
-            <label className="block text-sm font-semibold mb-1">Service Title</label>
+            <label className="block text-sm font-semibold mb-1">Service name</label>
             <span className="absolute left-4 top-11 text-[#FD7924]"><FaTag /></span>
             <input
               type="text"
-              name="title"
-              value={formData.title}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               placeholder="e.g., Logo Design"
               className="w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
@@ -107,12 +150,12 @@ export default function AddServicePage() {
               <label className="block text-sm font-semibold mb-1">Duration (minutes)</label>
               <span className="absolute left-4 top-11 text-[#FD7924]"><FaClock /></span>
               <input
-                type="number"
-                name="duration"
-                value={formData.duration}
+                type="datetime-local"
+                name="exchange_time"
+                value={formData.exchange_time}
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
-                required
+
               />
             </div>
           </div>
@@ -127,8 +170,22 @@ export default function AddServicePage() {
               onChange={handleChange}
               placeholder="e.g., John Doe"
               className="w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
-              required
+
             />
+            {/* <label className="block text-sm font-semibold mb-1">Category</label>
+            <span className="absolute left-4 top-11 text-[#FD7924]"><FaList /></span>
+            <select
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleChange}
+              className="appearance-none w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+              required
+            >
+              <option value='0'>Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
+            </select> */}
           </div>
 
           {/* Category */}
@@ -136,15 +193,15 @@ export default function AddServicePage() {
             <label className="block text-sm font-semibold mb-1">Category</label>
             <span className="absolute left-4 top-11 text-[#FD7924]"><FaList /></span>
             <select
-              name="category"
-              value={formData.category}
+              name="category_id"
+              value={formData.category_id}
               onChange={handleChange}
               className="appearance-none w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
               required
             >
-              <option value="">Select a category</option>
-              {categories.map((cat, i) => (
-                <option key={i} value={cat}>{cat}</option>
+              <option value='0'>Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
               ))}
             </select>
           </div>

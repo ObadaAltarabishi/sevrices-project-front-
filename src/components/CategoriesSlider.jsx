@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import {
   FaPaintBrush,
@@ -13,22 +14,24 @@ import {
   FaThLarge
 } from 'react-icons/fa';
 
-const categories = [
-  { name: 'All', icon: <FaThLarge /> },
-  { name: 'Design', icon: <FaPaintBrush /> },
-  { name: 'Writing', icon: <FaPenNib /> },
-  { name: 'Marketing', icon: <FaBullhorn /> },
-  { name: 'Programming', icon: <FaCode /> },
-  { name: 'Video', icon: <FaVideo /> },
-  { name: 'Audio', icon: <FaMusic /> },
-  { name: 'Business', icon: <FaBriefcase /> },
-  { name: 'Lifestyle', icon: <FaHeart /> },
-  { name: 'Translation', icon: <FaLanguage /> }
-];
+// const categories = [
+//   { name: 'All', icon: <FaThLarge /> },
+//   { name: 'Design', icon: <FaPaintBrush /> },
+//   { name: 'Writing', icon: <FaPenNib /> },
+//   { name: 'Marketing', icon: <FaBullhorn /> },
+//   { name: 'Programming', icon: <FaCode /> },
+//   { name: 'Video', icon: <FaVideo /> },
+//   { name: 'Audio', icon: <FaMusic /> },
+//   { name: 'Business', icon: <FaBriefcase /> },
+//   { name: 'Lifestyle', icon: <FaHeart /> },
+//   { name: 'Translation', icon: <FaLanguage /> }
+// ];
 
 export default function CategoriesSlider({ onCategorySelect }) {
   const scrollRef = useRef();
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const [categories, setCategories] = useState([{ name: 'All' }]);
 
   const scrollLeft = () => scrollRef.current.scrollBy({ left: -150, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current.scrollBy({ left: 150, behavior: 'smooth' });
@@ -36,7 +39,23 @@ export default function CategoriesSlider({ onCategorySelect }) {
   const handleSelect = (category, index) => {
     setActiveIndex(index);
     onCategorySelect(category.name);
+    console.log(category.name)
   };
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  async function fetchData() {
+    try {
+      axios.get('http://127.0.0.1:8000/api/categories').then((res) => {
+
+        setCategories([{ name: 'All' }, ...res.data.data]);
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
+  }
 
   return (
     <div className="flex items-center gap-2 px-6 py-4" style={{ backgroundColor: '#FBF6E3' }}>

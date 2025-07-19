@@ -8,31 +8,72 @@ import {
   FaBirthdayCake,
   FaBriefcase,
   FaInfoCircle,
-  FaTools
+  FaTools,
+  FaVoicemail,
+  FaPassport
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function FullPageRegister() {
   const [image, setImage] = useState('https://via.placeholder.com/150');
   const fileInputRef = useRef();
   const [agreed, setAgreed] = useState(false);
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [age, setAge] = useState('');
+  const [experience, setExperience] = useState('');
+  const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
+
 
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
 
   const handleImageChange = (e) => {
+    // const file = e.target.files[0];
+    // if (file) {
+    //   const imageUrl = URL.createObjectURL(file);
+    //   setImage(imageUrl);
+    // }
+    console.log('changes')
     const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
-    }
+    setSelectedImage(file);
+    setImage(URL.createObjectURL(file));
+    console.log(image)
   };
 
   const handleNext = (e) => {
     e.preventDefault();
+    console.log('before')
     if (agreed) {
-      navigate('/confirm-email');
+      const form = new FormData();
+      form.append('picture', selectedImage);
+      form.append('name', name);
+      form.append('role', 'user');
+      form.append('location', location);
+      form.append('phone_number', phone);
+      form.append('description', description);
+      form.append('age', age);
+      form.append('experience_years', experience);
+      form.append('email', email);
+      form.append('password', password);
+      console.log('after')
+      axios.post('http://127.0.0.1:8000/api/register', form).then((res) => {
+        console.log(res.data)
+        localStorage.setItem("user", JSON.stringify(res.data));
+
+        navigate('/confirm-email');
+
+      }).catch((err) => {
+        console.log(err.response.data.message)
+        setError(err.response.data.message)
+      })
     }
   };
 
@@ -54,17 +95,71 @@ export default function FullPageRegister() {
       <div className="w-[65%] flex flex-col justify-center px-20 py-10 space-y-6 z-10">
         <h2 className="text-4xl font-bold text-[#FD7924]">Create Your Account</h2>
         <form className="space-y-4" onSubmit={handleNext}>
-          <InputWithIcon icon={FaUser} type="text" placeholder="Full Name" />
-          <InputWithIcon icon={FaPhone} type="tel" placeholder="Phone Number" />
-          <InputWithIcon icon={FaEnvelope} type="email" placeholder="Email" />
-          <InputWithIcon icon={FaLock} type="password" placeholder="Password" />
+          <div className="relative">
+            <span className="absolute left-4 top-3 text-[#FD7924]">
+              <FaUser />
+            </span>
+            <input
+              icon={FaUser}
+              type="text"
+              placeholder="Full Name"
+              className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="relative">
+            <span className="absolute left-4 top-3 text-[#FD7924]">
+              <FaPhone />
+            </span>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+
+              icon={FaPhone} type="tel" placeholder="Phone Number" onChange={(e) => setPhone(e.target.value)} />
+          </div>
+          <div className="relative">
+            <span className="absolute left-4 top-3 text-[#FD7924]">
+              <FaUser />
+            </span>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+
+              icon={FaEnvelope} type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div className="relative">
+            <span className="absolute left-4 top-3 text-[#FD7924]">
+              <FaPassport />
+            </span>
+            <input
+              className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+
+              icon={FaLock} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+          </div>
           <div className="flex gap-4">
             <div className="w-1/2">
-              <InputWithIcon icon={FaBirthdayCake} type="number" placeholder="Age" />
+              <div className="relative">
+                <span className="absolute left-4 top-3 text-[#FD7924]">
+                  <FaTools />
+                </span>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+
+                  type="number" placeholder="Age" onChange={(e) => setAge(e.target.value)} />
+
+              </div>
             </div>
             <div className="w-1/2">
-              <InputWithIcon icon={FaBriefcase} type="text" placeholder="Experience (years)" />
+              <div className="relative">
+                <span className="absolute left-4 top-3 text-[#FD7924]">
+                  <FaUser />
+                </span>
+                <input
+                  className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+                  type='number'
+                  icon={FaBriefcase} placeholder="Experience (years)" onChange={(e) => setExperience(e.target.value)} />
+              </div>
             </div>
           </div>
 
@@ -73,22 +168,24 @@ export default function FullPageRegister() {
               <FaInfoCircle />
             </span>
             <textarea
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="About You"
               rows="3"
               className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
             />
           </div>
-
           <div className="relative">
             <span className="absolute left-4 top-3 text-[#FD7924]">
-              <FaTools />
+              <FaInfoCircle />
             </span>
             <textarea
-              placeholder="Services you can offer"
-              rows="2"
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Your Location"
+              rows="3"
               className="w-full pl-10 pr-4 py-3 border border-[#FD7924] bg-[#F7E9CC] text-[#262626] rounded-full focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
             />
           </div>
+
 
           <div className="flex items-center space-x-2 mt-4">
             <input
@@ -109,9 +206,8 @@ export default function FullPageRegister() {
           <div className="flex justify-between pt-4">
             <button
               type="submit"
-              className={`px-6 py-2 rounded-full text-white font-semibold transition-colors ${
-                agreed ? 'bg-[#FD7924] hover:bg-[#e56e1c]' : 'bg-gray-400 cursor-not-allowed'
-              }`}
+              className={`px-6 py-2 rounded-full text-white font-semibold transition-colors ${agreed ? 'bg-[#FD7924] hover:bg-[#e56e1c]' : 'bg-gray-400 cursor-not-allowed'
+                }`}
               disabled={!agreed}>
               Next
             </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaPaintBrush,
@@ -12,6 +12,7 @@ import {
   FaLanguage,
   FaThLarge,
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export const allServices = [
   {
@@ -32,7 +33,7 @@ export const allServices = [
     price: { min: 200, max: 500 },
     image: 'https://via.placeholder.com/300x200?text=Web+Dev',
   },
-   {
+  {
     id: 3,
     name: 'Social Media Management',
     category: 'Marketing',
@@ -115,7 +116,7 @@ export const allServices = [
 
   },
   {
-     id: 12,
+    id: 12,
     name: 'Translation Novel',
     category: 'Translation',
     duration: 1,
@@ -146,6 +147,22 @@ export default function ServiceList({
   priceFilter,
   durationFilter,
 }) {
+
+  async function fetchData() {
+    try {
+      axios.get('http://127.0.0.1:8000/api/services').then((res) => {
+        console.log(res.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    console.log('category is '.selectedCategory)
+    fetchData()
+  }, [selectedCategory])
   const navigate = useNavigate();
   const [visibleCount, setVisibleCount] = useState(4);
 
@@ -177,10 +194,10 @@ export default function ServiceList({
       </h2>
 
       {visibleServices.length === 0 && (
-  <div className="flex justify-center items-center h-40 rounded-lg" style={{ backgroundColor: '#FBF6E3' }}>
-    <p className="text-[#262626] text-lg">No matching services found.</p>
-  </div>
-)}
+        <div className="flex justify-center items-center h-40 rounded-lg" style={{ backgroundColor: '#FBF6E3' }}>
+          <p className="text-[#262626] text-lg">No matching services found.</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {visibleServices.map((service) => (
@@ -220,8 +237,8 @@ export default function ServiceList({
       </div>
 
       {visibleCount < filteredServices.length && (
-        <div className="text-center mt-6"> 
-        <button
+        <div className="text-center mt-6">
+          <button
             className="px-4 py-2 rounded transition font-semibold"
             style={{
               backgroundColor: '#FD7924',

@@ -14,8 +14,39 @@ import {
   FaEdit,
   FaKey,
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function ProfilePage() {
+
+  const [profile, setProfile] = useState(null);
+
+
+  async function fetchData() {
+    try {
+      const userData = localStorage.getItem('user');
+      axios.get('http://127.0.0.1:8000/api/profiles/' + JSON.parse(userData).user.profile.id, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+
+      }).then((res) => {
+        console.log(res.data)
+        setProfile(res.data)
+        setUser(res.data.user)
+        setServices(res.data.user.services)
+
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    fetchData()
+  }, [])
+
   const mockUser = {
     id: 'user123',
     name: 'John Doe',
@@ -54,12 +85,13 @@ export default function ProfilePage() {
   ];
 
   const [user, setUser] = useState(null);
+  const [image, setImage] = useState();
   const [services, setServices] = useState([]);
 
-  useEffect(() => {
-    setUser(mockUser);
-    setServices(mockServices);
-  }, []);
+  // useEffect(() => {
+  //   // setUser(mockUser);
+  //   // setServices(mockServices);
+  // }, []);
 
   if (!user) return <div className="p-6">Loading...</div>;
 
@@ -69,7 +101,7 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center gap-6 border-b pb-8 mb-8" style={{ borderColor: '#FD7924' }}>
           <img
-            src={user.image}
+            src={profile.picture_url}
             alt="Profile"
             className="w-28 h-28 rounded-full object-cover border-4"
             style={{ borderColor: '#FD7924' }}
@@ -82,13 +114,13 @@ export default function ProfilePage() {
               <FaEnvelope /> {user.email}
             </p>
             <p className="text-sm mt-1 flex items-center gap-2" style={{ color: '#262626' }}>
-              <FaPhone /> {user.phone}
+              <FaPhone /> {user.phone_number}
             </p>
             <p className="text-sm mt-1 flex items-center gap-2" style={{ color: '#262626' }}>
-              <FaBirthdayCake /> Age: {user.age}
+              <FaBirthdayCake /> Age: {profile.age}
             </p>
             <p className="text-xs mt-1 italic flex items-center gap-2" style={{ color: '#9A9A9A' }}>
-              <FaCalendarAlt /> Member since {user.memberSince}
+              <FaCalendarAlt /> Member since {profile.created_at}
             </p>
           </div>
         </div>
@@ -102,7 +134,7 @@ export default function ProfilePage() {
           </div>
           <div className="rounded-xl p-6 shadow-md text-center" style={{ backgroundColor: '#FBF6E3' }}>
             <FaCheckCircle className="text-3xl mb-2" style={{ color: '#FD7924' }} />
-            <p className="text-4xl font-extrabold" style={{ color: '#262626' }}>35</p>
+            <p className="text-4xl font-extrabold" style={{ color: '#262626' }}>2</p>
             <p className="mt-1 font-medium" style={{ color: '#262626' }}>Orders Completed</p>
           </div>
         </div>
@@ -113,9 +145,7 @@ export default function ProfilePage() {
             About Me
           </h3>
           <p className="text-lg leading-relaxed" style={{ color: '#262626' }}>
-            I'm a freelance graphic designer with over 5 years of experience creating logos,
-            branding, and visual identities. Passionate about delivering clean and professional
-            designs that meet client needs.
+            {profile.description}
           </p>
         </div>
 
@@ -135,20 +165,20 @@ export default function ProfilePage() {
                   style={{ backgroundColor: '#FBF6E3' }}
                 >
                   <img
-                    src={service.image}
+                    src={service.images[0].url}
                     alt={service.title}
                     className="w-28 h-28 object-cover rounded-lg mb-4 border"
                     style={{ borderColor: '#FD7924' }}
                   />
-                  <h4 className="text-lg font-bold" style={{ color: '#FD7924' }}>{service.title}</h4>
+                  <h4 className="text-lg font-bold" style={{ color: '#FD7924' }}>{service.name}</h4>
                   <p className="mt-1 flex items-center gap-1" style={{ color: '#262626' }}>
                     <FaDollarSign /> ${service.price}
                   </p>
                   <p className="mt-1 flex items-center gap-1" style={{ color: '#262626' }}>
-                    <FaTag /> {service.category}
+                    <FaTag /> {service.category.name}
                   </p>
                   <p className="mt-1 flex items-center gap-1" style={{ color: '#262626' }}>
-                    <FaClock /> {service.duration}
+                    <FaClock /> {service.exchange_time}
                   </p>
                 </div>
               ))}
@@ -165,13 +195,13 @@ export default function ProfilePage() {
           >
             <FaEdit /> Edit Profile
           </Link>
-          <Link
+          {/* <Link
             to="/change-password"
             className="px-6 py-3 rounded-full shadow transition font-semibold flex items-center gap-2"
             style={{ backgroundColor: '#FBF6E3', color: '#FD7924' }}
           >
             <FaKey /> Change Password
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

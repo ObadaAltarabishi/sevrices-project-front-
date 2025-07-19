@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaDollarSign, FaClock } from 'react-icons/fa';
-import logo from '../assets/logo.png'; 
+import logo from '../assets/logo.png';
 import {
   FaBars,
   FaSearch,
@@ -25,18 +25,26 @@ export default function Header({
   const [showMenu, setShowMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [user, setUser] = useState(false);
   const navigate = useNavigate();
   const notificationRef = useRef(null);
 
   const handleMenuClick = (path) => {
     setShowMenu(false);
+    if (path === '/') {
+      localStorage.removeItem('user')
+    }
     navigate(path);
   };
 
   useEffect(() => {
+    const userData = localStorage.getItem('user');
+    setUser(JSON.parse(userData).user.profile);
+    console.log(JSON.parse(userData))
     setTimeout(() => {
       setHasNotifications(true);
     }, 2000);
+    console.log(user)
   }, []);
 
   useEffect(() => {
@@ -84,7 +92,7 @@ export default function Header({
         </div>
 
         {/* Duration Filter */}
-        <div className="relative">
+        {/* <div className="relative">
           <FaClock className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#FD7924] text-sm" />
           <select
             value={durationFilter}
@@ -95,7 +103,7 @@ export default function Header({
             <option value="short">Short</option>
             <option value="long">Long</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Notifications + Profile + Menu */}
@@ -149,7 +157,7 @@ export default function Header({
             onClick={() => navigate('/profile')}
           >
             <img
-              src="https://via.placeholder.com/150"
+              src={user.picture_url}
               alt="Profile"
               className="w-full h-full object-cover"
             />

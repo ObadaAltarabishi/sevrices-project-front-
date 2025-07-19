@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaUser,
@@ -9,15 +9,42 @@ import {
   FaSave,
   FaUserEdit,
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function EditProfilePage() {
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    age: 28,
-    experience: 5,
-    about: 'I’m a graphic designer...',
-    services: 'Logo Design, Flyers, Social Media Posts',
+    name: '',
+    age: 0,
+    experience: 0,
+    description: '',
+    location: '',
   });
+  // const navigate = useNavigate();
+  const [image, setImage] = useState('https://via.placeholder.com/150');
+
+
+  async function fetchData() {
+    try {
+      const userData = localStorage.getItem('user');
+      axios.get('http://127.0.0.1:8000/api/profiles/' + JSON.parse(userData).user.profile.id, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        console.log(res.data)
+        setImage(res.data.picture_url)
+        setFormData({ name: res.data.user.name, age: res.data.age, experience: res.data.experience_years, description: res.data.description, location: res.data.location })
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const [profileImage, setProfileImage] = useState(
     'https://i.pinimg.com/736x/9a/37/2e/9a372e8a3d61f2755b6a9a564bcd98c2.jpg'
@@ -33,51 +60,67 @@ export default function EditProfilePage() {
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImageUpload = async (e) => {
+    // const file = e.target.files[0];
+    // if (!file) return;
     const file = e.target.files[0];
-    if (!file) return;
+    setSelectedImage(file);
+    setImage(URL.createObjectURL(file));
 
-    const formDataImg = new FormData();
-    formDataImg.append('image', file);
-
-    try {
-      // وهمي الآن – غيّره لرابط باكندك لاحقًا
-      const res = await fetch('https://your-api.com/upload', {
-        method: 'POST',
-        body: formDataImg,
-      });
-
-      const data = await res.json();
-      setProfileImage(data.imageUrl); // حدث الرابط حسب الاستجابة
-    } catch (err) {
-      console.error('Image upload failed', err);
-    }
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
 
+    const formDataImg = new FormData();
+    formDataImg.append('image', selectedImage);
+    formDataImg.append('age', formData.age);
+    formDataImg.append('description', formData.description);
+    formDataImg.append('location', formData.location);
+    formDataImg.append('experience_years', formData.experience);
+
     try {
-      const profileData = {
-        ...formData,
-        image: profileImage,
-      };
+      const userData = localStorage.getItem('user');
+      formDataImg.append('_method', 'PATCH');
+      axios.post(
+        'http://127.0.0.1:8000/api/profiles/' + JSON.parse(userData).user.profile.id,
+        formDataImg,
+        {
+          headers: {
+            'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+          },
+        }
+      ).then((res) => {
 
-      console.log('Data to send:', profileData);
-      // مثال إرسال البيانات:
-      /*
-      const res = await fetch('https://your-api.com/profile/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-      });
-      */
-
-      // navigate('/profile');
+        navigate('/profile')
+      }).catch((err) => {
+        console.log(err)
+      })
     } catch (err) {
-      console.error('Save failed', err);
+      console.log(err)
     }
+    // try {
+    // const profileData = {
+    //   ...formData,
+    //   image: profileImage,
+    // };
+
+    console.log('Data to send:', profileData);
+    // مثال إرسال البيانات:
+    /*
+    const res = await fetch('https://your-api.com/profile/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    */
+
+    // navigate('/profile');
+    // } catch (err) {
+    //   console.error('Save failed', err);
+    // }
   };
 
   const InputWithIcon = ({ icon: Icon, ...props }) => (
@@ -135,8 +178,8 @@ export default function EditProfilePage() {
                 <FaInfoCircle />
               </span>
               <textarea
-                name="about"
-                value={formData.about}
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
                 placeholder="About You"
                 rows="3" className="w-full pl-10 pr-4 py-2 border border-orange-300 rounded-md bg-white text-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -148,10 +191,10 @@ export default function EditProfilePage() {
                 <FaTools />
               </span>
               <textarea
-                name="services"
-                value={formData.services}
+                name="location"
+                value={formData.location}
                 onChange={handleChange}
-                placeholder="Services you offer"
+                placeholder="location "
                 rows="2"
                 className="w-full pl-10 pr-4 py-2 border border-orange-300 rounded-md bg-white text-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -175,7 +218,7 @@ export default function EditProfilePage() {
             className="w-40 h-40 rounded-full overflow-hidden border-4 border-orange-600 shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300"
           >
             <img
-              src={profileImage}
+              src={image}
               alt="Profile"
               className="w-full h-full object-cover"
             />

@@ -1,11 +1,30 @@
 import { useParams } from 'react-router-dom';
-import { allServices } from '../components/ServiceList';
+// import { allServices } from '../components/ServiceList';
 import { FaUser, FaTags, FaClock, FaDollarSign, FaShoppingCart, FaEnvelope } from 'react-icons/fa';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 export default function ServiceDetails() {
   const { id } = useParams();
   const serviceId = parseInt(id, 10);
-  const service = allServices.find((s) => s.id === serviceId);
+  // const service = allServices.find((s) => s.id === serviceId);
+  const [service, setService] = useState([]);
+
+  async function fetchData() {
+    try {
+      axios.get('http://127.0.0.1:8000/api/service/' + id).then((res) => {
+        console.log(res.data.data)
+        setService(res.data.data)
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   if (!service) {
     return (
@@ -15,13 +34,13 @@ export default function ServiceDetails() {
     );
   }
 
-  const similarServices = allServices.filter(
-    (s) => s.category === service.category && s.id !== service.id
-  );
+  // const similarServices = allServices.filter(
+  //   (s) => s.category === service.category && s.id !== service.id
+  // );
 
-  const sameSellerServices = allServices.filter(
-    (s) => s.seller === service.seller && s.id !== service.id
-  );
+  // const sameSellerServices = allServices.filter(
+  //   (s) => s.seller === service.seller && s.id !== service.id
+  // );
 
   return (
     <div className="min-h-screen bg-[#FBF6E3] py-10 px-4 text-[#262626]">
@@ -52,11 +71,11 @@ export default function ServiceDetails() {
               </div>
               <div className="flex items-center gap-1">
                 <FaClock className="text-[#FD7924]" />
-                <span className="font-semibold">Duration:</span> {service.duration} days
+                <span className="font-semibold">Duration:</span> {service.exchange_time} days
               </div>
               <div className="flex items-center gap-1">
                 <FaDollarSign className="text-[#FD7924]" />
-                <span className="font-semibold">Price:</span> Between ${service.price.min} and ${service.price.max}
+                <span className="font-semibold">Price:</span>  ${service.price}
               </div>
             </div>
 
@@ -82,7 +101,7 @@ export default function ServiceDetails() {
         <section className="mt-12">
           <h2 className="text-2xl font-bold text-[#FD7924] mb-4">Similar services</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {similarServices.slice(0, 3).map((s) => (
+            {/* {similarServices.slice(0, 3).map((s) => (
               <div
                 key={s.id}
                 className="bg-[#FEF8E7] rounded-lg p-4 shadow-sm hover:shadow-md transition border border-[#FD7924]"
@@ -98,14 +117,14 @@ export default function ServiceDetails() {
                   ${s.price.min} - ${s.price.max}
                 </p>
               </div>
-            ))}
+            ))} */}
           </div>
         </section>
 
         <section className="mt-12">
           <h2 className="text-2xl font-bold text-[#FD7924] mb-4">More from this seller</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sameSellerServices.slice(0, 3).map((s) => (
+            {/* {sameSellerServices.slice(0, 3).map((s) => (
               <div
                 key={s.id}
                 className="bg-[#FEF8E7] rounded-lg p-4 shadow-sm hover:shadow-md transition border border-[#FD7924]"
@@ -121,7 +140,7 @@ export default function ServiceDetails() {
                   ${s.price.min} - ${s.price.max}
                 </p>
               </div>
-            ))}
+            ))} */}
           </div>
         </section>
       </div>

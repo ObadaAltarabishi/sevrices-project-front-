@@ -1,15 +1,32 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSignIn = (e) => {
     e.preventDefault();
-    navigate('/home'); // Navigate to home page
+
+    try {
+
+      axios.post('http://127.0.0.1:8000/api/login', { 'email': email, 'password': password }).then((res) => {
+        console.log(res.data)
+        localStorage.setItem("user", JSON.stringify(res.data));
+        navigate('/home');
+      }).catch((err) => {
+        console.log(err.response.data.message)
+        setError(err.response.data.message)
+      })
+    }
+    catch (err) {
+      setError(err.response.data.message)
+    }
+    // navigate('/home'); // Navigate to home page
   };
 
   return (
@@ -61,7 +78,9 @@ export default function LoginPage() {
             Sign In
           </button>
         </form>
-
+        <div className='text-red-600'>
+          {error}
+        </div>
         <div className="text-sm text-[#262626]">
           Don't have an account?{' '}
           <Link to="/register" className="text-[#FD7924] hover:underline">
