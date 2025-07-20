@@ -11,6 +11,7 @@ export default function AddServicePage() {
     exchange_time: new Date().toISOString().split('T')[0],
     provider: '',
     category_id: 0,
+    exchange_with_category_id: 0,
     path: null,
     imagePreview: '',
     description: '',
@@ -161,7 +162,8 @@ export default function AddServicePage() {
           </div>
 
           {/* Provider */}
-          <div className="relative"> <label className="block text-sm font-semibold mb-1">Provider Name</label>
+          <div className="relative">
+            {/* <label className="block text-sm font-semibold mb-1">Provider Name</label>
             <span className="absolute left-4 top-11 text-[#FD7924]"><FaUser /></span>
             <input
               type="text"
@@ -171,12 +173,12 @@ export default function AddServicePage() {
               placeholder="e.g., John Doe"
               className="w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
 
-            />
-            {/* <label className="block text-sm font-semibold mb-1">Category</label>
+            /> */}
+            <label className="block text-sm font-semibold mb-1">Exchange with category <span>(Not Required)</span></label>
             <span className="absolute left-4 top-11 text-[#FD7924]"><FaList /></span>
             <select
-              name="category_id"
-              value={formData.category_id}
+              name="exchange_with_category_id"
+              value={formData.exchange_with_category_id}
               onChange={handleChange}
               className="appearance-none w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
               required
@@ -185,7 +187,7 @@ export default function AddServicePage() {
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>{category.name}</option>
               ))}
-            </select> */}
+            </select>
           </div>
 
           {/* Category */}
@@ -250,10 +252,10 @@ export default function AddServicePage() {
             </button>
           </div>
         </form>
-      </div>
+      </div >
 
       {/* Animation style */}
-      <style>{`
+      < style > {`
         @keyframes fadeInOut {
           0%, 100% { opacity: 0; }
           10%, 90% { opacity: 1; }
@@ -261,7 +263,7 @@ export default function AddServicePage() {
         .animate-fadeInOut {
           animation: fadeInOut 3s ease forwards;
         }
-      `}</style>
-    </div>
+      `}</style >
+    </div >
   );
 }
