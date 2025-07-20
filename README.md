@@ -1,2 +1,20 @@
-# my-login-app
+# 🚀 Vite + React App
 
+This is a fast, modern frontend project built with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/). It supports local development, production builds, and deployment via GitHub Pages.
+
+---
+
+## 📦 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/your-repo-name.git
+
+# Navigate into the project folder
+cd your-repo-name
+
+# Install dependencies
+npm install
+
+# Install Vite dependencies
+npm install --save-dev vite
