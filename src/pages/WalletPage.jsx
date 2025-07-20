@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { FaMoneyBillWave, FaLock, FaEye, FaEyeSlash, FaCreditCard } from 'react-icons/fa';
 
 export default function WalletPage() {
@@ -6,13 +7,48 @@ export default function WalletPage() {
   const [password, setPassword] = useState('');
   const [amount, setAmount] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [balance] = useState(120); // رصيد المحفظة كمثال ثابت
+  const [balance, setBalance] = useState(0); // رصيد المحفظة كمثال ثابت
 
   const handleTransfer = (e) => {
     e.preventDefault();
-    console.log('Transferring money to:', stripeAccount, 'Amount:', amount);
-    alert('Transfer initiated!');
+    const userData = localStorage.getItem('user');
+    axios.post('http://127.0.0.1:8000/api/wallet/add-funds', { 'amount': amount }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      setBalance(res.data.new_balance)
+      setAmount('')
+      alert('Transfer initiated!');
+
+    }).catch((err) => {
+      console.log(err)
+    })
   };
+  function fetchData() {
+    try {
+      const userData = localStorage.getItem('user');
+      axios.get('http://127.0.0.1:8000/api/wallet', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+
+      }).then((res) => {
+        console.log(res.data)
+        setBalance(res.data.balance)
+
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#FBF6E3] p-6 flex items-center justify-center">
@@ -22,12 +58,11 @@ export default function WalletPage() {
         {/* رصيد المستخدم */}
         <div className="mb-6 flex items-center justify-between bg-[#F7E9CC] rounded-xl px-5 py-4 text-[#262626] font-semibold shadow-md">
           <span>💰 Current Balance:</span>
-          <span>${balance.toFixed(2)}</span>
+          <span>${balance}</span>
         </div>
 
         <form onSubmit={handleTransfer} className="space-y-6">
-          {/* Stripe Account */}
-          <div className="relative">
+          {/* <div className="relative">
             <FaCreditCard className="absolute top-3.5 left-4 text-[#FD7924]" />
             <input
               type="text"
@@ -39,7 +74,6 @@ export default function WalletPage() {
             />
           </div>
 
-          {/* Password */}
           <div className="relative">
             <FaLock className="absolute top-3.5 left-4 text-[#FD7924]" />
             <input
@@ -56,7 +90,7 @@ export default function WalletPage() {
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
-          </div>
+          </div> */}
 
           {/* Amount */}
           <div className="relative">
