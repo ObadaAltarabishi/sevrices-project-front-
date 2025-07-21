@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import NProgress from "nprogress";
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -16,8 +18,14 @@ import MyOrders from './pages/MyOrders';
 import LandingPage from './pages/LandingPage';
 import WalletPage from './pages/WalletPage';
 import SettingsPage from './pages/SettingsPage';
-
+import AdminLayout from './admin/AdminLayout';
+import ManageUser from './admin/ManageUser';
+import ManageServices from './admin/ManageServices';
+import ManageCategories from './admin/ManageCategories';
+import EditServicePage from './pages/EditServicePage';
 function App() {
+  
+ 
   // ✅ 1. الحالة العامة للوضع الداكن
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
@@ -50,11 +58,17 @@ function App() {
         <Route path="/add-service" element={<AddServices darkMode={darkMode} setDarkMode={setDarkMode}/>} />
         <Route path="/my-orders" element={<MyOrders darkMode={darkMode} setDarkMode={setDarkMode} />} />
 
-        {/* ✅ مرر حالة الوضع الداكن وزر التبديل للصفحات التي فيها الزر */}
+      
         <Route path="/" element={<LandingPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         <Route path="/wallet" element={<WalletPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
+        <Route path="/admin/users" element={<ManageUser />}/>
+        <Route path="/admin/services" element ={<ManageServices/>}/>
+        <Route path="/admin/categories" element={<ManageCategories/>} />
+        <Route path="/edit-service/:id" element={<EditServicePage/>}/>
+        
       </Routes>
+      <ToastContainer position="top-center" autoClose={2000}/>
     </Router>
   );
 }

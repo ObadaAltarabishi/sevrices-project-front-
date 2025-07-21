@@ -88,10 +88,10 @@ export default function ProfilePage() {
   const [image, setImage] = useState();
   const [services, setServices] = useState([]);
 
-  // useEffect(() => {
-  //   // setUser(mockUser);
-  //   // setServices(mockServices);
-  // }, []);
+  useEffect(() => {
+    setUser(mockUser);
+    setServices(mockServices);
+  }, []);
 
   if (!user) return <div className="p-6">Loading...</div>;
 
@@ -178,8 +178,26 @@ export default function ProfilePage() {
                     <FaTag /> {service.category.name}
                   </p>
                   <p className="mt-1 flex items-center gap-1" style={{ color: '#262626' }}>
-                    <FaClock /> {service.exchange_time}
+                    <FaClock /> {service.duration}
                   </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 mt-auto">
+                    <Link
+                      to={`/edit-service/${service.id}`}
+                      className="px-4 py-2 rounded-full text-sm font-semibold shadow transition flex items-center gap-1"
+                      style={{ backgroundColor: '#FD7924', color: '#FBF6E3' }}
+                    >
+                      <FaEdit /> Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(service.id)}
+                      className="px-4 py-2 rounded-full text-sm font-semibold shadow transition flex items-center gap-1"
+                      style={{ backgroundColor: '#FFFFFF', color: '#FD7924', border: '1px solid #FD7924' }}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
