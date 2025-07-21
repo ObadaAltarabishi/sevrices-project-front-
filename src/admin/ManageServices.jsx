@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { FaCheckCircle, FaTimesCircle, FaTools, FaSearch } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const dummyServices = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
@@ -14,16 +15,58 @@ const dummyServices = Array.from({ length: 20 }, (_, i) => ({
 const SERVICES_PER_PAGE = 5;
 
 const ManageServices = () => {
-  const [visibleCount, setVisibleCount] = useState(SERVICES_PER_PAGE);
+  const [visibleCount, setVisibleCount] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleApprove = (service) => {
+    const userData = localStorage.getItem('user');
+    console.log(service.id)
+    axios.post('http://127.0.0.1:8000/api/admin/services/' + service.id + '/approve', {}, {
+      headers: {
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      console.log(res.data.data)
+      fechData()
+    }).catch((err) => {
+    })
     toast.success(`Service "${service.name}" approved!`);
   };
 
   const handleReject = (service) => {
+    const userData = localStorage.getItem('user');
+
+    axios.post('http://127.0.0.1:8000/api/admin/services/' + service.id + '/reject', {}, {
+      headers: {
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      console.log(res.data.data)
+      fechData()
+    }).catch((err) => {
+    })
+
     toast.error(`Service "${service.name}" rejected!`);
   };
+  const fechData = () => {
+    try {
+      const userData = localStorage.getItem('user');
+
+      axios.post('http://127.0.0.1:8000/api/admin/services/pending', { search: searchTerm }, {
+        headers: {
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        console.log(res.data)
+        setVisibleCount(res.data)
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
+  }
+  useEffect(() => {
+    fechData()
+  }, [searchTerm])
 
   const filteredServices = dummyServices.filter(
     (service) =>
@@ -62,15 +105,15 @@ const ManageServices = () => {
 
         {/* Services List */}
         <div className="space-y-4">
-          {visibleServices.length > 0 ? (
-            visibleServices.map((service) => (
+          {visibleCount.length > 0 ? (
+            visibleCount.map((service) => (
               <div
                 key={service.id}
                 className="bg-[#FBF6E3] border border-[#F7E9CC] p-4 rounded-md shadow flex justify-between items-center"
               >
                 <div>
                   <h3 className="text-lg font-semibold text-[#262626]">{service.name}</h3>
-                  <p className="text-sm text-[#262626]">By: {service.provider}</p>
+                  <p className="text-sm text-[#262626]">By: {service.category.name}</p>
                 </div>
                 <div className="flex gap-2">
                   <button

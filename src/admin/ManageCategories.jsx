@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { FaTags, FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const ManageCategories = () => {
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Design' },
-    { id: 2, name: 'Development' },
-    { id: 3, name: 'Marketing' },
-  ]);
+  const [categories, setCategories] = useState([]);
 
   const [newCategory, setNewCategory] = useState('');
   const [editCategoryId, setEditCategoryId] = useState(null);
@@ -19,6 +16,19 @@ const ManageCategories = () => {
   const handleAdd = () => {
     if (!newCategory.trim()) return toast.warning('Please enter a category name');
     const newId = categories.length + 1;
+    try {
+      const userData = localStorage.getItem('user');
+
+      axios.post('http://127.0.0.1:8000/api/categories', { name: newCategory }, {
+        headers: {
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        fetchData
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
     setCategories([...categories, { id: newId, name: newCategory }]);
     toast.success(`Category "${newCategory}" added!`);
     setNewCategory('');
@@ -30,6 +40,20 @@ const ManageCategories = () => {
     setCategories(updated);
     toast.error('Category deleted!');
   };
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  async function fetchData() {
+    try {
+      axios.get('http://127.0.0.1:8000/api/categories').then((res) => {
+
+        setCategories(res.data.data);
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
+  }
 
   // بدء التعديل
   const startEdit = (category) => {
@@ -39,6 +63,19 @@ const ManageCategories = () => {
 
   // حفظ التعديل
   const saveEdit = (id) => {
+    try {
+      const userData = localStorage.getItem('user');
+
+      axios.patch('http://127.0.0.1:8000/api/categories/' + id, { name: editCategoryName }, {
+        headers: {
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
     const updated = categories.map(cat =>
       cat.id === id ? { ...cat, name: editCategoryName } : cat
     );
@@ -101,12 +138,12 @@ const ManageCategories = () => {
                 >
                   <FaEdit /> {editCategoryId === category.id ? 'Save' : 'Edit'}
                 </button>
-                <button
+                {/* <button
                   onClick={() => handleDelete(category.id)}
                   className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                 >
                   <FaTrash /> Delete
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
@@ -114,7 +151,7 @@ const ManageCategories = () => {
 
         <ToastContainer position="top-right" autoClose={3000} />
       </div>
-      </AdminLayout>
+    </AdminLayout>
   );
 };
 

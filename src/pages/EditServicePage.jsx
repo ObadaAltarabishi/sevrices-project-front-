@@ -1,34 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaEdit, FaSave } from 'react-icons/fa';
 
 export default function EditServicePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const location = useLocation();
+  const service = location.state?.service;
 
+  console.log('Received service:', service);
   // بيانات وهمية (لاحقاً تجيبها من API)
   const mockService = {
     id,
     title: 'Logo Design',
     price: 50,
     category: 'Design',
-    duration: '2 days',
+    exchange_time: '2 days',
     image: 'https://via.placeholder.com/100?text=Logo',
   };
 
   const [formData, setFormData] = useState({
-    title: '',
-    price: '',
-    category: '',
-    duration: '',
-    image: '',
+    id: service.id,
+    title: service.name,
+    price: service.price,
+    category: service.category_id,
+    exchange_time: '',
+    image: service.images.url,
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
-    setFormData(mockService);
+    // setFormData(mockService);
   }, [id]);
 
   const handleChange = (e) => {
@@ -62,7 +66,7 @@ export default function EditServicePage() {
     formDataToSend.append('title', formData.title);
     formDataToSend.append('price', formData.price);
     formDataToSend.append('category', formData.category);
-    formDataToSend.append('duration', formData.duration);
+    formDataToSend.append('exchange_time', formData.exchange_time);
 
     if (selectedFile) {
       formDataToSend.append('image', selectedFile);
@@ -141,9 +145,9 @@ export default function EditServicePage() {
           <div>
             <label className="block mb-1 font-medium" style={{ color: '#262626' }}>Duration</label>
             <input
-              type="text"
-              name="duration"
-              value={formData.duration}
+              type="datetime-local"
+              name="exchange_time"
+              value={formData.exchange_time}
               onChange={handleChange}
               className="w-full p-3 rounded-full border focus:outline-none"
               style={{ borderColor: '#FD7924', backgroundColor: '#FBF6E3' }}

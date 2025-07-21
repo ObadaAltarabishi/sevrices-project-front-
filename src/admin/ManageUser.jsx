@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { FaUserCog, FaBan, FaBell, FaSearch } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 // بيانات وهمية (مثال لـ 20 يوزر)
 const dummyUsers = Array.from({ length: 100 }, (_, i) => ({
@@ -16,14 +17,47 @@ const USERS_PER_PAGE = 10;
 
 const ManageUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [visibleCount, setVisibleCount] = useState(USERS_PER_PAGE);
+  const [visibleCount, setVisibleCount] = useState([]);
 
   const handleBlock = (user) => {
     toast.error(`${user.name} has been blocked!`);
+    const userData = localStorage.getItem('user');
+
+    axios.get('http://127.0.0.1:8000/api/admin/users/' + user.id + '/block', {
+      headers: {
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+
+    }).catch((err) => {
+      setError(err.response.data.message)
+    })
   };
+  useEffect(() => {
+    try {
+      axios.post('http://127.0.0.1:8000/api/admin/show_users', { 'search': searchTerm },
+      ).then((res) => {
+        console.log(res.data.data)
+        setVisibleCount(res.data.data)
+      }).catch((err) => {
+      })
+    } catch (err) {
+    }
+  }, [searchTerm])
 
   const handleWarn = (user) => {
     toast.warning(`A warning was sent to ${user.name}`);
+    const userData = localStorage.getItem('user');
+
+    axios.post('http://127.0.0.1:8000/api/admin/users/' + user.id + '/increase-reports', {
+      headers: {
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+
+    }).catch((err) => {
+      setError(err.response.data.message)
+    })
   };
 
   const filteredUsers = dummyUsers.filter(
@@ -32,7 +66,7 @@ const ManageUsers = () => {
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const visibleUsers = filteredUsers.slice(0, visibleCount);
+  // const visibleUsers = filteredUsers.slice(0, visibleCount);
 
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + USERS_PER_PAGE);
@@ -61,8 +95,8 @@ const ManageUsers = () => {
         </div>
 
         <div className="space-y-4">
-          {visibleUsers.length > 0 ? (
-            visibleUsers.map((user) => (
+          {visibleCount.length > 0 ? (
+            visibleCount.map((user) => (
               <div
                 key={user.id}
                 className="bg-[#FBF6E3] border border-[#F7E9CC] p-4 rounded-md shadow flex justify-between items-center"

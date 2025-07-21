@@ -88,10 +88,10 @@ export default function ProfilePage() {
   const [image, setImage] = useState();
   const [services, setServices] = useState([]);
 
-  useEffect(() => {
-    setUser(mockUser);
-    setServices(mockServices);
-  }, []);
+  // useEffect(() => {
+  //   setUser(mockUser);
+  //   setServices(mockServices);
+  // }, []);
 
   if (!user) return <div className="p-6">Loading...</div>;
 
@@ -178,13 +178,14 @@ export default function ProfilePage() {
                     <FaTag /> {service.category.name}
                   </p>
                   <p className="mt-1 flex items-center gap-1" style={{ color: '#262626' }}>
-                    <FaClock /> {service.duration}
+                    <FaClock /> {service.exchange_time}
                   </p>
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 mt-auto">
                     <Link
                       to={`/edit-service/${service.id}`}
+                      state={{ service }}
                       className="px-4 py-2 rounded-full text-sm font-semibold shadow transition flex items-center gap-1"
                       style={{ backgroundColor: '#FD7924', color: '#FBF6E3' }}
                     >

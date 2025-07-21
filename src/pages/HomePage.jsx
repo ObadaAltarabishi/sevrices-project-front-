@@ -44,6 +44,7 @@ export default function HomePage() {
           search: searchTerm
         }
       }).then((res) => {
+        console.log(res.data.data)
         setAllServices(res.data.data)
       }).catch((err) => {
         console.log(err)
@@ -56,7 +57,7 @@ export default function HomePage() {
     fetchData()
   }, [selectedCategory, searchTerm])
   const navigate = useNavigate();
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [visibleCount, setVisibleCount] = useState(100);
 
   const filteredServices = allServices
     // .filter(
