@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  FaThLarge, FaUsers, FaCogs
+  FaThLarge, FaUsers, FaCogs,
+  FaClipboardList
 } from 'react-icons/fa';
 
 const AdminSidebar = () => {
@@ -22,6 +23,12 @@ const AdminSidebar = () => {
       path: '/admin/categories',
       label: 'Manage Categories',
       icon: <FaThLarge />,
+    },
+    {
+      path:'/admin/orders',
+      label:'Manage Orders',
+      icon:<FaClipboardList/>
+
     },
   ];
 
