@@ -11,7 +11,7 @@ This is a fast, modern frontend project built with [Vite](https://vitejs.dev/) a
 git clone https://github.com/ObadaAltarabishi/sevrices-project-front-.git
 
 # Navigate into the project folder
-cd your-repo-name
+cd sevrices-project-front-
 
 # Install dependencies
 npm install
