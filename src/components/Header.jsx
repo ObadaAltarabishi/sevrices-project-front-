@@ -25,6 +25,7 @@ export default function Header({
   const [showMenu, setShowMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(false);
   const navigate = useNavigate();
   const notificationRef = useRef(null);
@@ -38,12 +39,16 @@ export default function Header({
   };
 
   useEffect(() => {
+
     const userData = localStorage.getItem('user');
-    setUser(JSON.parse(userData).user.profile);
-    console.log(JSON.parse(userData))
-    setTimeout(() => {
-      setHasNotifications(true);
-    }, 2000);
+    if (userData) {
+
+      setUser(JSON.parse(userData).user);
+      console.log(JSON.parse(userData))
+      setTimeout(() => {
+        setHasNotifications(true);
+      }, 2000);
+    }
     console.log(user)
   }, []);
 
@@ -150,25 +155,40 @@ export default function Header({
           )}
         </div>
 
-        {/* Profile + Menu Button */}
-        <div className="flex items-center gap-2">
-          <div
-            className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#FD7924] cursor-pointer"
-            onClick={() => navigate('/profile')}
-          >
-            <img
-              src={user.picture_url}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <button
-            className="text-xl text-[#FD7924]"
-            onClick={() => setShowMenu(!showMenu)}
-          >
-            <FaBars />
-          </button>
+        <div className='flex'>
+          {user.role == 'admin' ? (
+            <button
+              type="button"
+              className="w-full py-3 px-3 bg-[#FD7924] text-white rounded-full hover:bg-[#e7671b] transition" onClick={() => navigate('/admin/users')}
+            >
+              Dashboard
+            </button>
+          ) : (null)}
+
         </div>
+        {/* Profile + Menu Button */}
+        {user ? (
+          <div className="flex items-center gap-2">
+
+            <div
+              className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#FD7924] cursor-pointer"
+              onClick={() => navigate('/profile')}
+            >
+              <img
+                src={user.profile.picture_url}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <button
+              className="text-xl text-[#FD7924]"
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <FaBars />
+            </button>
+          </div>
+        ) : (null)}
+
 
         {/* Dropdown Menu */}
         {showMenu && (

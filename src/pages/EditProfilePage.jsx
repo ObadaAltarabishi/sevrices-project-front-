@@ -44,6 +44,7 @@ export default function EditProfilePage() {
   }
   useEffect(() => {
     fetchData()
+
   }, [])
 
   const [profileImage, setProfileImage] = useState(

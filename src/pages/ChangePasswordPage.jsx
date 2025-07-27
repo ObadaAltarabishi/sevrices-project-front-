@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -21,6 +22,23 @@ export default function ChangePasswordPage() {
       return;
     }
 
+    try {
+      const userData = localStorage.getItem('user');
+
+      axios.post('http://127.0.0.1:8000/api/update_user', { 'password': newPassword }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        setNewPassword('')
+      }).catch((err) => {
+        console.log(err.response.data.message)
+      })
+    }
+    catch (err) {
+      console.log(err)
+    }
     console.log('Password changed:', { currentPassword, newPassword });
 
     setMessage('Password changed successfully!');
@@ -39,7 +57,7 @@ export default function ChangePasswordPage() {
 
         <form onSubmit={handleSave} className="space-y-6">
           {/* Current Password */}
-          <div className="relative">
+          {/* <div className="relative">
             <FaLock className="absolute top-3.5 left-4 text-[#FD7924]" />
             <input
               type={showCurrent ? 'text' : 'password'}
@@ -58,7 +76,7 @@ export default function ChangePasswordPage() {
             >
               {showCurrent ? <FaEyeSlash /> : <FaEye />}
             </span>
-          </div>
+          </div> */}
 
           {/* New Password */}
           <div className="relative">
@@ -101,7 +119,7 @@ export default function ChangePasswordPage() {
               onClick={() => setShowConfirm(!showConfirm)}
             >
               {showConfirm ? <FaEyeSlash /> : <FaEye />}
-              </span>
+            </span>
           </div>
 
           <button

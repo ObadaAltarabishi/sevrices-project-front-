@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { FaEdit, FaSave } from 'react-icons/fa';
+import { FaClock, FaEdit, FaList, FaSave } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function EditServicePage() {
   const { id } = useParams();
@@ -15,24 +16,32 @@ export default function EditServicePage() {
     id,
     title: 'Logo Design',
     price: 50,
-    category: 'Design',
+    category_id: 'Design',
     exchange_time: '2 days',
     image: 'https://via.placeholder.com/100?text=Logo',
   };
 
   const [formData, setFormData] = useState({
     id: service.id,
-    title: service.name,
+    name: service.name,
     price: service.price,
     category: service.category_id,
-    exchange_time: '',
+    exchange_time: service.exchange_time,
     image: service.images.url,
   });
+  const [categories, setCategories] = useState([]);
 
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     // setFormData(mockService);
+    axios.get('http://127.0.0.1:8000/api/categories').then((res) => {
+
+      setCategories(res.data.data);
+      console.log(res.data.data)
+    }).catch((err) => {
+      console.log(err)
+    })
   }, [id]);
 
   const handleChange = (e) => {
@@ -58,37 +67,66 @@ export default function EditServicePage() {
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [image, setImage] = useState('https://via.placeholder.com/150');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('category', formData.category);
-    formDataToSend.append('exchange_time', formData.exchange_time);
+    // const formDataToSend = new FormData();
+    // formDataToSend.append('name', formData.name);
+    // formDataToSend.append('price', formData.price);
+    // formDataToSend.append('category_id', formData.category);
+    // formDataToSend.append('exchange_time', formData.exchange_time);
 
-    if (selectedFile) {
-      formDataToSend.append('image', selectedFile);
-    }
-
+    // if (selectedFile) {
+    //   formDataToSend.append('image', selectedImage);
+    // }
     try {
-      // غيّر الرابط حسب API الباك عندك
-      const response = await fetch(`https://your-api.com/services/${id}/update`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
+      const userData = localStorage.getItem('user');
+      // formDataToSend.append('_method', 'PATCH');
+      axios.patch(
+        'http://127.0.0.1:8000/api/services/' + service.id,
+        formData,
+        {
+          headers: {
+            'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+          },
+        }
+      ).then((res) => {
 
-      if (response.ok) {
-        alert('Service updated successfully!');
         navigate('/profile');
-      } else {
-        alert('Failed to update service.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred');
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (err) {
+      console.log(err)
     }
+    // try {
+    //   // غيّر الرابط حسب API الباك عندك
+    //   const response = await fetch(`https://your-api.com/services/${id}/update`, {
+    //     method: 'POST',
+    //     body: formDataToSend,
+    //   });
+
+    //   if (response.ok) {
+    //     alert('Service updated successfully!');
+    //     navigate('/profile');
+    //   } else {
+    //     alert('Failed to update service.');
+    //   }
+    // } catch (error) {
+    //   console.error('Error:', error);
+    //   alert('An error occurred');
+    // }
+  };
+  const handleImageUpload = async (e) => {
+    // const file = e.target.files[0];
+    // if (!file) return;
+    const file = e.target.files[0];
+    setSelectedImage(file);
+    setImage(URL.createObjectURL(file));
+
   };
 
   return (
@@ -104,8 +142,8 @@ export default function EditServicePage() {
             <label className="block mb-1 font-medium" style={{ color: '#262626' }}>Service Title</label>
             <input
               type="text"
-              name="title"
-              value={formData.title}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               className="w-full p-3 rounded-full border focus:outline-none"
               style={{ borderColor: '#FD7924', backgroundColor: '#FBF6E3' }}
@@ -128,36 +166,40 @@ export default function EditServicePage() {
           </div>
 
           {/* Category */}
-          <div>
-            <label className="block mb-1 font-medium" style={{ color: '#262626' }}>Category</label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
+          <div className="relative">
+            <label className="block text-sm font-semibold mb-1">Category</label>
+            <span className="absolute left-4 top-11 text-[#FD7924]"><FaList /></span>
+            <select
+              name="category_id"
+              value={formData.category_id}
               onChange={handleChange}
-              className="w-full p-3 rounded-full border focus:outline-none"
-              style={{ borderColor: '#FD7924', backgroundColor: '#FBF6E3' }}
+              className="appearance-none w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
               required
-            />
+            >
+              <option value='0'>Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Duration */}
-          <div>
-            <label className="block mb-1 font-medium" style={{ color: '#262626' }}>Duration</label>
+          <div className='relative'>
+            <label className="block text-sm font-semibold mb-1">Duration (minutes)</label>
+            <span className="absolute left-4 top-11 text-[#FD7924]"><FaClock /></span>
             <input
               type="datetime-local"
               name="exchange_time"
               value={formData.exchange_time}
               onChange={handleChange}
-              className="w-full p-3 rounded-full border focus:outline-none"
-              style={{ borderColor: '#FD7924', backgroundColor: '#FBF6E3' }}
-              required
+              className="w-full pl-10 pr-4 py-3 rounded-full border border-[#FD7924] bg-[#FBF6E3] text-[#262626] focus:outline-none focus:ring-2 focus:ring-[#FD7924]"
+
             />
           </div>
 
           {/* Image Upload */}
-          <div className="text-center">
-            <input
+          <div className="text-center ">
+            {/* <input
               type="file"
               accept="image/*"
               onChange={handleImageChange}
@@ -170,7 +212,25 @@ export default function EditServicePage() {
               onClick={handleImageClick}
               className="w-32 h-32 object-cover rounded-lg mx-auto border cursor-pointer hover:opacity-80 transition"
               style={{ borderColor: '#FD7924' }}
-            />
+            /> */}
+            {/* <div
+              onClick={handleImageClick}
+              className="w-40 h-40 rounded-full overflow-hidden border-4 border-orange-600 shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300"
+            >
+              <img
+                src={formData.image}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              className="hidden"
+            /> */}
             <p className="text-sm mt-2" style={{ color: '#262626' }}>Click the image to upload a new one</p>
           </div>
 

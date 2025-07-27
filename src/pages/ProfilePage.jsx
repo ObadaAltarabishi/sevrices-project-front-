@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   FaUser,
   FaEnvelope,
@@ -19,11 +19,13 @@ import axios from 'axios';
 export default function ProfilePage() {
 
   const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
 
 
   async function fetchData() {
     try {
       const userData = localStorage.getItem('user');
+
       axios.get('http://127.0.0.1:8000/api/profiles/' + JSON.parse(userData).user.profile.id, {
         headers: {
           'Content-Type': 'application/json',
@@ -38,11 +40,33 @@ export default function ProfilePage() {
 
       }).catch((err) => {
         console.log(err)
+        localStorage.removeItem('user')
+        navigate('/')
       })
     } catch (err) {
       console.log(err)
+      localStorage.removeItem('user')
+      navigate('/')
     }
   }
+  const handleDelete = (id) => {
+    const userData = localStorage.getItem('user');
+
+    axios.delete('http://127.0.0.1:8000/api/services/' + id, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+
+    }).then((res) => {
+      console.log(res.data)
+      fetchData()
+    }).catch((err) => {
+      console.log(err)
+      localStorage.removeItem('user')
+      navigate('/')
+    })
+  };
   useEffect(() => {
     fetchData()
   }, [])

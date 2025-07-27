@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import axios from 'axios';
+import Loogo from '../assets/Loogo.png';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -90,8 +91,13 @@ export default function LoginPage() {
       </div>
 
       {/* القسم الأيمن */}
-      <div className="w-[40%] flex items-center justify-center z-10">
-        <h1 className="text-5xl font-bold text-[#FD7924] tracking-wider">ServEx</h1>
+      <div className="w-[40%] flex  items-center justify-center z-10 mx-5">
+        {/* <h1 className="text-5xl font-bold text-[#FD7924] tracking-wider">ServEx</h1> */}
+        <img
+          src={Loogo}
+          alt='logo'
+          className="w-full   rounded-full"
+        />
       </div>
     </div>
   );

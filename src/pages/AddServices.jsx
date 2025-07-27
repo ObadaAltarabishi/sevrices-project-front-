@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   FaTag, FaDollarSign, FaClock, FaUser, FaList, FaImage, FaAlignLeft
 } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function AddServicePage() {
   const [formData, setFormData] = useState({
@@ -59,6 +60,7 @@ export default function AddServicePage() {
     setPreviewUrl(URL.createObjectURL(file));
 
   };
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -96,6 +98,8 @@ export default function AddServicePage() {
         });
       }).catch((err) => {
         setError(err.response.data.message)
+        localStorage.removeItem('user')
+        navigate('')
       })
     }
     catch (err) {

@@ -1,15 +1,31 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { FaTrashAlt, FaEnvelope, FaPhoneAlt, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
+  const [phone, setPhone] = useState('');
 
-  const handleDeleteAccount = () => {
-    if (window.confirm('Are you sure you want to delete your account?')) {
-      console.log('Account deleted');
-      // هنا تقدر تضيف استدعاء API لحذف الحساب لاحقاً
-      navigate('/login');
+  const handleDeleteAccount = (e) => {
+    e.preventDefault();
+
+    try {
+      const userData = localStorage.getItem('user');
+
+      axios.post('http://127.0.0.1:8000/api/update_user', { 'phone_number': phone }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        setPhone('')
+      }).catch((err) => {
+        console.log(err.response.data.message)
+      })
+    }
+    catch (err) {
+      console.log(err)
     }
   };
 
@@ -19,7 +35,7 @@ export default function SettingsPage() {
         <h2 className="text-3xl font-bold text-center text-[#FD7924]">Settings</h2>
 
         {/* Email */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-semibold mb-1">Email</label>
           <div className="flex items-center border rounded-full px-4 py-2 bg-[#FEF8E7] border-[#FD7924]">
             <FaEnvelope className="mr-2 text-[#FD7924]" />
@@ -29,21 +45,32 @@ export default function SettingsPage() {
               className="bg-transparent w-full outline-none text-[#262626]"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Phone */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Phone Number</label>
-          <div className="flex items-center border rounded-full px-4 py-2 bg-[#FEF8E7] border-[#FD7924]">
-            <FaPhoneAlt className="mr-2 text-[#FD7924]" />
-            <input
-              type="tel"
-              placeholder="+1 234 567 890"
-              className="bg-transparent w-full outline-none text-[#262626]"
-            />
-          </div>
-        </div>
+        <form onSubmit={handleDeleteAccount} className="space-y-6">
 
+          <div>
+
+            <label className="block text-sm font-semibold mb-1">Change Phone Number</label>
+            <div className="flex items-center border rounded-full px-4 py-2 bg-[#FEF8E7] border-[#FD7924]">
+              <FaPhoneAlt className="mr-2 text-[#FD7924]" />
+              <input
+                type="tel"
+                placeholder="+1 234 567 890"
+                className="bg-transparent w-full outline-none text-[#262626]"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+          </div>
+          <button
+            type='submit'
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-yellow-500 hover:bg-yellow-700 text-white font-semibold transition"
+          >
+            Save
+          </button>
+        </form>
         {/* Change Password */}
         <button
           onClick={() => navigate('/change-password')}
@@ -53,14 +80,7 @@ export default function SettingsPage() {
           Change Password
         </button>
 
-        {/* Delete Account */}
-        <button
-          onClick={handleDeleteAccount}
-          className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold transition"
-        >
-          <FaTrashAlt />
-          Delete Account
-        </button>
+
       </div>
     </div>
   );

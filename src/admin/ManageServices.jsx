@@ -111,10 +111,19 @@ const ManageServices = () => {
                 key={service.id}
                 className="bg-[#FBF6E3] border border-[#F7E9CC] p-4 rounded-md shadow flex justify-between items-center"
               >
+                <div className='flex '>
+                  <img
+                    src={service.images[0].url}
+                    alt={service.name}
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold text-[#262626]">{service.name}</h3>
+                  <h4 className="text-lg font-semibold text-[#262626]">{service.price}$</h4>
                   <p className="text-sm text-[#262626]">By: {service.category.name}</p>
                 </div>
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleApprove(service)}

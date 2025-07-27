@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { FaMoneyBillWave, FaLock, FaEye, FaEyeSlash, FaCreditCard } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function WalletPage() {
   const [stripeAccount, setStripeAccount] = useState('');
@@ -8,10 +9,12 @@ export default function WalletPage() {
   const [amount, setAmount] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [balance, setBalance] = useState(0); // رصيد المحفظة كمثال ثابت
+  const navigate = useNavigate();
 
-  const handleTransfer = (e) => {
+  const handleTransfer = async (e) => {
     e.preventDefault();
     const userData = localStorage.getItem('user');
+    console.log(userData)
     axios.post('http://127.0.0.1:8000/api/wallet/add-funds', { 'amount': amount }, {
       headers: {
         'Content-Type': 'application/json',
@@ -41,9 +44,13 @@ export default function WalletPage() {
 
       }).catch((err) => {
         console.log(err)
+        localStorage.removeItem('user')
+        navigate('')
       })
     } catch (err) {
       console.log(err)
+      localStorage.removeItem('user')
+      navigate('')
     }
   }
   useEffect(() => {
