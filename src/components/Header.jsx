@@ -13,6 +13,7 @@ import {
   FaCog,
   FaSignOutAlt,
 } from 'react-icons/fa';
+import axios from 'axios';
 
 export default function Header({
   searchTerm,
@@ -25,6 +26,7 @@ export default function Header({
   const [showMenu, setShowMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(false);
   const navigate = useNavigate();
@@ -53,6 +55,20 @@ export default function Header({
   }, []);
 
   useEffect(() => {
+    const userData = localStorage.getItem('user');
+    axios.get('http://127.0.0.1:8000/api/notifications', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      console.log(res.data.data)
+
+      setNotifications(res.data.data)
+
+    }).catch((err) => {
+      console.log(err)
+    })
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
@@ -134,23 +150,18 @@ export default function Header({
             <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-md border z-50">
               <div className="p-3 border-b font-semibold text-[#262626]">Notifications</div>
               <ul className="max-h-60 overflow-y-auto">
-                {[
-                  'New order received',
-                  'Service approved',
-                  'Payment successful',
-                  'New message from client',
-                ].map((note, index) => (
+                {notifications.map((note, index) => (
                   <li
                     key={index}
                     className="px-4 py-2 text-sm hover:bg-[#F7E9CC] text-[#262626] border-b last:border-none"
                   >
-                    {note}
+                    {note.content}
                   </li>
                 ))}
               </ul>
-              <div className="text-center text-sm text-[#FD7924] hover:underline p-2 cursor-pointer">
+              {/* <div className="text-center text-sm text-[#FD7924] hover:underline p-2 cursor-pointer">
                 View all
-              </div>
+              </div> */}
             </div>
           )}
         </div>

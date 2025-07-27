@@ -85,6 +85,7 @@ export default function MyOrders() {
     }).catch((err) => {
     })
   }
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -102,31 +103,69 @@ export default function MyOrders() {
     })
 
 
-  }, [])
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  }, [selectedImage])
 
-  const handleImageChange = (e) => {
-
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
+    // For UI preview, if you need it:
     setSelectedImage(file);
     // setPreviewUrl(URL.createObjectURL(file));
-    const userData = localStorage.getItem('user');
 
+    // Build the FormData with the fresh `file` reference
+    const formData = new FormData();
+    formData.append('path', file);
+    formData.append('receiver_id', receiverId);
 
-    const form = new FormData();
-    form.append('path', selectedImage);
-    form.append('receiver_id', receiverId);
+    try {
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      const res = await axios.post(
+        `http://127.0.0.1:8000/api/orders/${serviceId}/files`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${userData.access_token}`,
+            // Let axios set multipart boundary automatically
+          },
+        }
+      )
+      res.then((res) => {
+        // setUserId(JSON.parse(userData).user.id)
+        axios.get('http://127.0.0.1:8000/api/orders', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+          },
+        }).then((res) => {
+          setDummyOrders(res.data.data)
+          console.log(res.data.data)
+        }).catch((err) => {
+          console.log(err)
+        })
+      }
+      );
 
-    // formData.append('image', formData.);
-    axios.post('http://127.0.0.1:8000/api/orders/' + serviceId + '/files', form, {
-      headers: {
-        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
-      },
-    }).then((res) => {
-      // setTimeout(() =>
-      setShowSuccess(false)
-      // , 3000);
+      // Success feedback
+      setShowSuccess(true);
+      setTimeout(() => {
+        // setUserId(JSON.parse(userData).user.id)
+        axios.get('http://127.0.0.1:8000/api/orders', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+          },
+        }).then((res) => {
+          setDummyOrders(res.data.data)
+          console.log(res.data.data)
+        }).catch((err) => {
+          console.log(err)
+        })
+        setShowSuccess(false)
+      }
+        , 3000);
+
+      // Reset your form fields
       setFormData({
         name: '',
         price: '',
@@ -137,24 +176,40 @@ export default function MyOrders() {
         imagePreview: '',
         description: '',
       });
+
+    } catch (err) {
+      console.error('Upload failed', err);
+      // handle or display error
+    }
+  };
+  const handleSubmit = (id) => {
+    const userData = localStorage.getItem('user');
+
+    axios.post('http://127.0.0.1:8000/api/orders/' + id, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      setShowAlert(false)
+      setUserId(JSON.parse(userData).user.id)
+      axios.get('http://127.0.0.1:8000/api/orders', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        setDummyOrders(res.data.data)
+        console.log(res.data.data)
+      }).catch((err) => {
+        console.log(err)
+      })
     }).catch((err) => {
-      setError(err.response.data.message)
-      localStorage.removeItem('user')
-      navigate('')
+      console.log(err)
     })
-
-  };
-
-  const handleFileChange = (e) => {
-
-    const file = e.target.files[0];
-    setSelectedFile(file);
-    // setPreviewFileUrl(URL.createObjectURL(file));
-
-  };
-  const completeService = () => {
-
   }
+  const [showAlert, setShowAlert] = useState(null);
+
   return (
     <div className="min-h-screen bg-[#FBF6E3] text-[#262626] py-10 px-4">
       <div className="max-w-6xl mx-auto">
@@ -197,10 +252,28 @@ export default function MyOrders() {
                         <FaUserTie className="text-[#FD7924]" />
                         Ordered from: <span className="font-medium">{order.user.name}</span>
                       </p>
-                      <p className="text-sm flex items-center gap-1">
-                        <FaCalendarAlt className="text-[#FD7924]" />
-                        Price: {order.service.price} $
-                      </p>
+                      {order.provided_service ? (
+                        <>
+                          <p className="text-sm flex items-center gap-1 font-bold" >
+                            <FaCalendarAlt className="text-[#FD7924]" />
+                            Exchange Service Name: {order.provided_service.name}
+                          </p>
+                          <p className="text-sm flex items-center gap-1 font-bold">
+                            <FaCalendarAlt className="text-[#FD7924]" />
+                            Description: {order.provided_service.description}
+                          </p>
+                          <p className="text-sm flex items-center gap-1 font-bold">
+                            <FaCalendarAlt className="text-[#FD7924]" />
+                            Exchange Time: {order.provided_service.exchange_time}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm flex items-center gap-1">
+                          <FaCalendarAlt className="text-[#FD7924]" />
+                          Price: {order.service.price} $
+                        </p>
+                      )}
+
                     </div>
 
                     <div className="flex flex-col items-start md:items-end gap-2 mt-4 md:mt-0">
@@ -234,6 +307,7 @@ export default function MyOrders() {
                                   />
                                   <button
                                     type="button"
+                                    disabled={!Boolean(order.files?.[0])}
                                     className="w-full mx-5 py-3 px-3 bg-[#32fd24] text-white rounded-full  transition" onClick={() => handle('completed', order.id)}
                                   >
                                     Complete
@@ -294,11 +368,41 @@ export default function MyOrders() {
                       <div className='flex'>
                         <>
                           {order.status === 'completed' && order.files[0] ? (
+
                             <div className='flex'>
+                              <>
+                                <button
+                                  onClick={() => setShowAlert(true)}
+                                  className="px-5 py-2 bg-[#fd2424] text-white rounded-full hover:bg-[#e66e00] transition flex items-center gap-2"
+                                >
+                                  Report
+                                </button>
+
+                                {showAlert && (
+                                  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+                                    <div className="bg-white p-6 rounded shadow-lg text-center">
+                                      <p className="mb-4">Are you sure you want Report this order?</p>
+                                      <p className="mb-5 text-red-500 ">If you Report it you can't cancel it.</p>
+                                      <button
+                                        onClick={() => handleSubmit(order.id)}
+                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                      >
+                                        Submit
+                                      </button>
+                                      <button
+                                        onClick={() => { setShowAlert(false) }}
+                                        className="px-4 py-2 mx-3 bg-gray-400 text-white rounded"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
                               <a
                                 href={order.files[0].path}
                                 download
-                                className="w-full py-3 px-3 bg-[#2436fd] text-white rounded-full transition inline-block text-center"
+                                className="w-full  mx-4 px-3 bg-[#2436fd] text-white rounded-full transition inline-block text-center"
                               >
                                 Download File
                               </a>
