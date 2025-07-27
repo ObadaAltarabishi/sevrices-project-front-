@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // import { allServices } from '../components/ServiceList';
 import { FaUser, FaTags, FaClock, FaDollarSign, FaShoppingCart, FaEnvelope } from 'react-icons/fa';
 import axios from 'axios';
@@ -61,6 +61,8 @@ export default function ServiceDetails() {
 
 
   }, [])
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const userData = localStorage.getItem('user');
@@ -71,6 +73,7 @@ export default function ServiceDetails() {
       },
     }).then((res) => {
       setShowAlert(false)
+      navigate('/my-orders')
     }).catch((err) => {
     })
   }

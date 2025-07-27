@@ -47,14 +47,7 @@ export default function AddServicePage() {
     }
   }, [])
   const handleImageChange = (e) => {
-    // const file = e.target.files[0];
-    // if (file) {
-    //   setFormData((prev) => ({
-    //     ...prev,
-    //     path: file,
-    //     imagePreview: URL.createObjectURL(file),
-    //   }));
-    // }
+
     const file = e.target.files[0];
     setSelectedImage(file);
     setPreviewUrl(URL.createObjectURL(file));

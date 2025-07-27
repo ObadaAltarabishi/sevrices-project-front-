@@ -63,7 +63,7 @@ export default function MyOrders() {
   };
   const handle = (result, id) => {
     const userData = localStorage.getItem('user');
-
+    console.log(id)
     axios.patch('http://127.0.0.1:8000/api/orders/' + id, { status: result }, {
       headers: {
         'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
@@ -104,6 +104,7 @@ export default function MyOrders() {
 
   }, [])
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleImageChange = (e) => {
 
@@ -143,6 +144,17 @@ export default function MyOrders() {
     })
 
   };
+
+  const handleFileChange = (e) => {
+
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    // setPreviewFileUrl(URL.createObjectURL(file));
+
+  };
+  const completeService = () => {
+
+  }
   return (
     <div className="min-h-screen bg-[#FBF6E3] text-[#262626] py-10 px-4">
       <div className="max-w-6xl mx-auto">
@@ -150,7 +162,6 @@ export default function MyOrders() {
           <FaClipboardList className="text-[#FD7924]" />
           My Orders
         </h1>
-
         {/* Filter */}
         <div className="flex justify-center mb-8 gap-4 flex-wrap">
           {['All', 'In Progress', 'accepted', 'rejected'].map((status) => (
@@ -172,7 +183,7 @@ export default function MyOrders() {
           {filteredOrders.map((order) => (
             <>
               {
-                userId == order.user_id ? (
+                userId != order.user_id ? (
                   < div
                     key={order.id}
                     className="bg-[#f2d18f] rounded-lg p-6 flex flex-col md:flex-row justify-between items-start md:items-center border border-[#FD7924] shadow-sm"
@@ -216,16 +227,14 @@ export default function MyOrders() {
                                 <>
                                   <input
                                     type="file"
-                                    accept="image/*"
                                     onClick={() => { setServiceId(order.id); setReceiverId(order.user_id) }}
-
                                     onChange={handleImageChange}
                                     className="block w-full text-[#262626]"
                                     required
                                   />
                                   <button
                                     type="button"
-                                    className="w-full py-3 px-3 bg-[#32fd24] text-white rounded-full  transition" onClick={() => handle('accepted', order.id)}
+                                    className="w-full mx-5 py-3 px-3 bg-[#32fd24] text-white rounded-full  transition" onClick={() => handle('completed', order.id)}
                                   >
                                     Complete
                                   </button>
@@ -271,8 +280,8 @@ export default function MyOrders() {
                       </p>
                     </div>
 
-                    <div className="flex flex-col items-start md:items-end gap-2 mt-4 md:mt-0">
-                      <span
+                    <div className=" flex flex-col items-start md:items-end gap-2 mt-4 md:mt-0">
+                      <div
                         className={`text-sm px-3 py-1 rounded-full font-medium flex items-center ${order.status === 'accepted'
                           ? 'bg-green-200 text-green-900'
                           : order.status === 'rejected'
@@ -281,9 +290,24 @@ export default function MyOrders() {
                           }`}
                       >
                         {renderStatusIcon(order.status)} {order.status}
-                      </span>
-                    </div>
-                  </div>
+                      </div>
+                      <div className='flex'>
+                        <>
+                          {order.status === 'completed' && order.files[0] ? (
+                            <div className='flex'>
+                              <a
+                                href={order.files[0].path}
+                                download
+                                className="w-full py-3 px-3 bg-[#2436fd] text-white rounded-full transition inline-block text-center"
+                              >
+                                Download File
+                              </a>
+                            </div>
+                          ) : (null)}
+                        </>
+
+                      </div>
+                    </div></div>
                 )
               }
             </>

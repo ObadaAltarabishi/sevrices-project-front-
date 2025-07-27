@@ -8,7 +8,7 @@ This is a fast, modern frontend project built with [Vite](https://vitejs.dev/) a
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/ObadaAltarabishi/sevrices-project-front-.git
 
 # Navigate into the project folder
 cd your-repo-name
