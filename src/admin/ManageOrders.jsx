@@ -11,18 +11,19 @@ const ManageOrders = () => {
     { id: 2, user: 'Bob', service: 'Web Development', price: 200, status: 'Pending' },
     { id: 3, user: 'Charlie', service: 'SEO Optimization', price: 120, status: 'Pending' },
   ]);
+  const [services, setServices] = useState([]);
 
   async function fetchData() {
     const userData = localStorage.getItem('user');
 
-    axios.get('http://127.0.0.1:8000/api/orders', {
+    axios.get('http://127.0.0.1:8000/api/admin/orders/rejected', {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
       },
     }).then((res) => {
       console.log(res.data.data)
-
+      setServices(res.data.data)
 
     }).catch((err) => {
       console.log(err)
@@ -34,18 +35,35 @@ const ManageOrders = () => {
     fetchData()
   }, [])
 
-  const handleStatusChange = (id, newStatus) => {
-    const updatedOrders = orders.map(order =>
-      order.id === id ? { ...order, status: newStatus } : order
-    );
-    setOrders(updatedOrders);
+  const handleStatusChange = (id) => {
+    const userData = localStorage.getItem('user');
 
-    if (newStatus === 'Completed') {
-      toast.success('Order marked as completed!');
-    } else if (newStatus === 'Canceled') {
-      toast.error('Order has been canceled.');
-    }
+    axios.get('http://127.0.0.1:8000/api/admin/orders/' + id + '/canReject', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      fetchData()
+    }).catch((err) => {
+      console.log(err)
+    })
   };
+  const handleCancelChange = (id) => {
+    const userData = localStorage.getItem('user');
+
+    axios.get('http://127.0.0.1:8000/api/admin/orders/' + id + '/approveCancel', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      fetchData()
+    }).catch((err) => {
+      console.log(err)
+    })
+  };
+
 
   return (
     <AdminLayout>
@@ -56,33 +74,33 @@ const ManageOrders = () => {
         </div>
 
         <div className="space-y-3">
-          {orders.map((order) => (
+          {services.map((order) => (
             <div
               key={order.id}
               className="bg-[#FBF6E3] border border-[#F7E9CC] p-4 rounded-md shadow flex flex-col md:flex-row md:justify-between md:items-center"
             >
               <div>
                 <h3 className="text-lg font-semibold text-[#262626]">
-                  {order.service} - <span className="font-normal">by {order.user}</span>
+                  {order.service.name} - <span className="font-normal">by {order.user.name}</span>
                 </h3>
                 <p className="text-sm text-[#555]">
-                  Price: ${order.price}
+                  Price: ${order.service.price}
                 </p>
               </div>
 
               <div className="flex gap-2 mt-3 md:mt-0">
                 <button
-                  onClick={() => handleStatusChange(order.id, 'Completed')}
-                  disabled={order.status !== 'Pending'}
-                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'Pending' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
+                  onClick={() => handleStatusChange(order.id)}
+                  disabled={order.status !== 'canceled'}
+                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'canceled' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
                     }`}
                 >
                   <FaCheck /> Complete
                 </button>
                 <button
-                  onClick={() => handleStatusChange(order.id, 'Canceled')}
-                  disabled={order.status !== 'Pending'}
-                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'Pending' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
+                  onClick={() => handleCancelChange(order.id)}
+                  disabled={order.status !== 'canceled'}
+                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'canceled' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
                     }`}
                 >
                   <FaTimes /> Cancel
