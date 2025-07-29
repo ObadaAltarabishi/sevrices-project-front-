@@ -60,13 +60,13 @@ export default function HomePage() {
   const [visibleCount, setVisibleCount] = useState(100);
 
   const filteredServices = allServices
-    // .filter(
-    //   (service) =>
-    //     selectedCategory === 'All' || service.category === selectedCategory
-    // )
-    // .filter((service) =>
-    //   service.name.toLowerCase().includes(searchTerm.toLowerCase())
-    // )
+    .filter(
+      (service) =>
+        selectedCategory === 'All' || service.category.name === selectedCategory
+    )
+    .filter((service) =>
+      service.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .sort((a, b) => {
       if (priceFilter === 'low') return a.price.min - b.price.min;
       else if (priceFilter === 'high') return b.price.max - a.price.max;
