@@ -41,10 +41,11 @@ export default function HomePage() {
       axios.get('http://127.0.0.1:8000/api/services', {
         params: {
           name: selectedCategory,
-          search: searchTerm
+          search: searchTerm,
+          sort_price: priceFilter
         }
       }).then((res) => {
-        console.log(res.data.data)
+
         setAllServices(res.data.data)
       }).catch((err) => {
         console.log(err)
@@ -55,7 +56,7 @@ export default function HomePage() {
   }
   useEffect(() => {
     fetchData()
-  }, [selectedCategory, searchTerm])
+  }, [selectedCategory, searchTerm, priceFilter])
   const navigate = useNavigate();
   const [visibleCount, setVisibleCount] = useState(100);
 

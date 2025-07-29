@@ -107,8 +107,8 @@ export default function Header({
             className="pl-7 pr-3 py-2 border border-[#FD7924] rounded-md text-sm text-[#262626] bg-[#F7E9CC]"
           >
             <option value="">Price</option>
-            <option value="low">Low to High</option>
-            <option value="high">High to Low</option>
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
           </select>
         </div>
 

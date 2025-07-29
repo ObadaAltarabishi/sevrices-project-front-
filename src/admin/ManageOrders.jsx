@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from './AdminLayout';
 import { FaClipboardList, FaCheck, FaTimes } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([
@@ -10,6 +11,28 @@ const ManageOrders = () => {
     { id: 2, user: 'Bob', service: 'Web Development', price: 200, status: 'Pending' },
     { id: 3, user: 'Charlie', service: 'SEO Optimization', price: 120, status: 'Pending' },
   ]);
+
+  async function fetchData() {
+    const userData = localStorage.getItem('user');
+
+    axios.get('http://127.0.0.1:8000/api/orders', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+      },
+    }).then((res) => {
+      console.log(res.data.data)
+
+
+    }).catch((err) => {
+      console.log(err)
+    })
+
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const handleStatusChange = (id, newStatus) => {
     const updatedOrders = orders.map(order =>
@@ -43,7 +66,7 @@ const ManageOrders = () => {
                   {order.service} - <span className="font-normal">by {order.user}</span>
                 </h3>
                 <p className="text-sm text-[#555]">
-                  Price: ${order.price} | Status: <span className="font-semibold">{order.status}</span>
+                  Price: ${order.price}
                 </p>
               </div>
 
@@ -51,18 +74,16 @@ const ManageOrders = () => {
                 <button
                   onClick={() => handleStatusChange(order.id, 'Completed')}
                   disabled={order.status !== 'Pending'}
-                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${
-                    order.status === 'Pending' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'Pending' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'
+                    }`}
                 >
                   <FaCheck /> Complete
                 </button>
                 <button
                   onClick={() => handleStatusChange(order.id, 'Canceled')}
                   disabled={order.status !== 'Pending'}
-                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${
-                    order.status === 'Pending' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 rounded text-white ${order.status === 'Pending' ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-400 cursor-not-allowed'
+                    }`}
                 >
                   <FaTimes /> Cancel
                 </button>
