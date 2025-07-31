@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaPaintBrush, FaCode, FaLanguage, FaUserCheck, FaHandshake, FaTools } from 'react-icons/fa';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { useState } from 'react';
-import Loogo from '../assets/Loogo.png'; 
+import Loogo from '../assets/Loogo.png';
 
 export default function LandingPage({ darkMode, setDarkMode }) {
   const [openFAQ, setOpenFAQ] = useState(null);
@@ -42,7 +42,7 @@ export default function LandingPage({ darkMode, setDarkMode }) {
           <img src={Loogo} alt="ServEx Logo" className="w-auto h-16 object-contain" />
           <h1 className="text-2xl md:text-4xl font-bold text-[#FD7924]">ServEx</h1>
         </div>
-       
+
       </header>
 
       {/* Hero Section */}
@@ -58,6 +58,12 @@ export default function LandingPage({ darkMode, setDarkMode }) {
           className="inline-block bg-[#FD7924] text-white px-6 py-3 rounded-full text-sm md:text-lg hover:bg-orange-600 transition-all"
         >
           Join Now
+        </Link>
+        <Link
+          to="/home"
+          className="inline-block mx-2 bg-[#FD7924] text-white px-6 py-3 rounded-full text-sm md:text-lg hover:bg-orange-600 transition-all"
+        >
+          Guest
         </Link>
       </section>
 
@@ -81,7 +87,7 @@ export default function LandingPage({ darkMode, setDarkMode }) {
       </section>
 
       {/* ServEx Features */}
-      <section className="mt-20 px-6 md:px-12 max-w-6xl mx-auto"> 
+      <section className="mt-20 px-6 md:px-12 max-w-6xl mx-auto">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-[#FD7924]">✨ Why Choose ServEx?</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow p-6 text-center">
