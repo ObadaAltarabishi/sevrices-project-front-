@@ -142,7 +142,7 @@ export default function HomePage() {
                   Category: {service.category.name}
                 </p>
                 <p className="text-sm mb-1 text-[#262626]">
-                  Deadline: {service.exchange_time} day(s)
+                  Deadline: {service.exchange_time} Hour(s)
                 </p>
 
                 <p className="text-sm font-medium text-[#FD7924]">

@@ -175,7 +175,7 @@ export default function ServiceDetails() {
               </div>
               <div className="flex items-center gap-1">
                 <FaClock className="text-[#FD7924]" />
-                <span className="font-semibold">Duration:</span> {service.exchange_time}
+                <span className="font-semibold">Duration:</span> {service.exchange_time} Hours
               </div>
               <div className="flex items-center gap-1">
                 <FaDollarSign className="text-[#FD7924]" />

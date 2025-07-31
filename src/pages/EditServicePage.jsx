@@ -185,10 +185,10 @@ export default function EditServicePage() {
 
           {/* Duration */}
           <div className='relative'>
-            <label className="block text-sm font-semibold mb-1">Duration (minutes)</label>
+            <label className="block text-sm font-semibold mb-1">Duration ( Hours )</label>
             <span className="absolute left-4 top-11 text-[#FD7924]"><FaClock /></span>
             <input
-              type="datetime-local"
+              type="number"
               name="exchange_time"
               value={formData.exchange_time}
               onChange={handleChange}

@@ -9,7 +9,7 @@ export default function AddServicePage() {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    exchange_time: new Date().toISOString().split('T')[0],
+    exchange_time: 0,
     provider: '',
     category_id: 0,
     exchange_with_category_id: 0,
@@ -145,10 +145,10 @@ export default function AddServicePage() {
               />
             </div>
             <div className="relative">
-              <label className="block text-sm font-semibold mb-1">Duration (minutes)</label>
+              <label className="block text-sm font-semibold mb-1">Duration (Hours)</label>
               <span className="absolute left-4 top-11 text-[#FD7924]"><FaClock /></span>
               <input
-                type="datetime-local"
+                type="number"
                 name="exchange_time"
                 value={formData.exchange_time}
                 onChange={handleChange}
