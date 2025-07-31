@@ -86,7 +86,10 @@ export default function ServiceDetails() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const userData = localStorage.getItem('user');
-
+    if (!JSON.parse(userData)) {
+      navigate('/login')
+      return
+    }
     axios.post('http://127.0.0.1:8000/api/orders', { service_id: service.id }, {
       headers: {
         'Authorization': 'Bearer ' + JSON.parse(userData).access_token,

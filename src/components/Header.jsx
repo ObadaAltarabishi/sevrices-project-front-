@@ -56,19 +56,24 @@ export default function Header({
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
-    axios.get('http://127.0.0.1:8000/api/notifications', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
-      },
-    }).then((res) => {
-      console.log(res.data.data)
+    try {
+      axios.get('http://127.0.0.1:8000/api/notifications', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + JSON.parse(userData).access_token,
+        },
+      }).then((res) => {
+        console.log(res.data.data)
 
-      setNotifications(res.data.data)
+        setNotifications(res.data.data)
 
-    }).catch((err) => {
-      console.log(err)
-    })
+      }).catch((err) => {
+        console.log(err)
+      })
+    } catch (error) {
+
+    }
+
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
