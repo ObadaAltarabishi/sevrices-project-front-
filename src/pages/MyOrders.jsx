@@ -149,7 +149,7 @@ export default function MyOrders() {
       // Success feedback
       setShowSuccess(true);
       setTimeout(() => {
-        // setUserId(JSON.parse(userData).user.id)
+        setUserId(JSON.parse(userData).user.id)
         axios.get('http://127.0.0.1:8000/api/orders', {
           headers: {
             'Content-Type': 'application/json',
@@ -346,7 +346,7 @@ export default function MyOrders() {
                       </h2>
                       <p className="text-sm flex items-center gap-1">
                         <FaUserTie className="text-[#FD7924]" />
-                        Ordered from: <span className="font-medium">{order.user.name}</span>
+                        Ordered from: <span className="font-medium">{order.sallerName}</span>
                       </p>
                       <p className="text-sm flex items-center gap-1">
                         <FaCalendarAlt className="text-[#FD7924]" />

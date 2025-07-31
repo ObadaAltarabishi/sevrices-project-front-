@@ -84,7 +84,7 @@ const ManageOrders = () => {
                   {order.service.name} - <span className="font-normal">by {order.user.name}</span>
                 </h3>
                 <p className="text-sm text-[#555]">
-                  Price: ${order.service.price}
+                  Price: ${order.service.price} |Buyer Email: {order.user.email}
                 </p>
               </div>
 
