@@ -69,6 +69,10 @@ export default function AddServicePage() {
       form.append('price', formData.price);
       form.append('exchange_time', formData.exchange_time);
       form.append('category_id', formData.category_id);
+      if (formData.exchange_with_category_id != 0) {
+        form.append('exchange_with_category_id', formData.exchange_with_category_id);
+
+      }
       form.append('description', formData.description);
       // formData.append('image', formData.);
       axios.post('http://127.0.0.1:8000/api/services', form, {
@@ -85,6 +89,7 @@ export default function AddServicePage() {
           exchange_time: new Date().toISOString().split('T')[0],
           provider: '',
           category_id: 0,
+          exchange_with_category_id: 0,
           path: null,
           imagePreview: '',
           description: '',
