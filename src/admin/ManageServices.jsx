@@ -121,7 +121,7 @@ const ManageServices = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-[#262626]">{service.name}</h3>
                   <h4 className="text-lg font-semibold text-[#262626]">{service.price}$</h4>
-                  <p className="text-sm text-[#262626]">By: {service.category.name}</p>
+                  <p className="text-sm text-[#262626]">By: {service.user.name}</p>
                 </div>
 
                 <div className="flex gap-2">
