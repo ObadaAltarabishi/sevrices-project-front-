@@ -308,7 +308,7 @@ export default function MyOrders() {
                                   <button
                                     type="button"
                                     disabled={!Boolean(order.files?.[0])}
-                                    className="w-full mx-5 py-3 px-3 bg-[#32fd24]  rounded-full  transition" onClick={() => handle('completed', order.id)}
+                                    className="w-full mx-5 py-3 px-3 bg-[#32fd24] font-bold  rounded-full  transition" onClick={() => handle('completed', order.id)}
                                   >
                                     Complete
                                   </button>
