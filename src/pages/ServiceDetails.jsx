@@ -158,14 +158,16 @@ export default function ServiceDetails() {
               <FaUser className="inline text-[#FD7924]" />
               <span className="font-semibold">Seller:</span> {service.user.name}
             </div>
-            {user ? (<><div className="flex items-center text-[#FD7924] text-sm gap-2">
+            {/* {user ? ( */}
+            <><div className="flex items-center text-[#FD7924] text-sm gap-2">
               <FaUser className="inline text-[#FD7924]" />
-              <span className="font-semibold">Phone:</span> {user.phone_number}
+              <span className="font-semibold">Phone:</span> {service.user.phone_number}
             </div>
               <div className="flex items-center text-[#FD7924] text-sm gap-2">
                 <FaUser className="inline text-[#FD7924]" />
-                <span className="font-semibold">Email:</span> {user.email}
-              </div></>) : (null)}
+                <span className="font-semibold">Email:</span> {service.user.email}
+              </div></>
+            {/* ) : (null)} */}
 
 
             <div className="flex flex-wrap gap-6 text-[#FD7924] text-sm">
